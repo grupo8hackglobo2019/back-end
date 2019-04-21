@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/grupo8hackglobo2019/back-end/service"
 	"github.com/grupo8hackglobo2019/back-end/model"
 )
 
@@ -13,6 +14,7 @@ var broadcast = make(chan model.Message)
 
 type Handler struct {
 	Upgrader websocket.Upgrader
+	Service *service.ElasticService
 }
 
 func (h *Handler) HandleConnections(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +33,15 @@ func (h *Handler) HandleConnections(w http.ResponseWriter, r *http.Request) {
 		
 		err := ws.ReadJSON(&msg)
 		if err != nil {
-				log.Printf("error: %v", err)
+				log.Printf("error reading json: %v", err)
+				delete(clients, ws)
+				break
+		}
+
+		ctx := r.Context()
+		error := h.Service.SaveToElastic(ctx, msg)
+		if error!= nil {
+				log.Printf("error saving to ES: %v", error)
 				delete(clients, ws)
 				break
 		}
