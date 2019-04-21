@@ -16,7 +16,7 @@ type Message struct {
 }
 
 type User struct {
-	ID			int			`json:"_id,omitempty"`
+	ID			string			`json:"_id,omitempty"`
 	Name		string			`json:"name"`
 	Avatar		string			`json:"avatar"`
 }
