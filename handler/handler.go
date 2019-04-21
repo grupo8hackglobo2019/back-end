@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"net/http"
+	"encoding/json"
 
 	"github.com/gorilla/websocket"
 	"github.com/grupo8hackglobo2019/back-end/service"
@@ -17,6 +18,38 @@ type Handler struct {
 	Service *service.ElasticService
 }
 
+func (h *Handler) SendViaPost(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == "POST" {
+
+		var payload model.Message
+
+		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+			log.Printf("ERROR: %s", err)
+			http.Error(w, "Bad request", http.StatusTeapot)
+			return
+		}
+
+		defer r.Body.Close()
+
+		ctx := r.Context()
+
+		error := h.Service.SaveToElastic(ctx, payload)
+		if error != nil {
+				log.Printf("error saving to ES: %v", error)
+				return
+		}
+
+		log.Printf("payload sending via post: %v", payload)
+		
+		broadcast <- payload
+
+
+	} else {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+	}
+}
+
 func (h *Handler) HandleConnections(w http.ResponseWriter, r *http.Request) {
 	
 	ws, err := h.Upgrader.Upgrade(w, r, nil)
@@ -27,28 +60,29 @@ func (h *Handler) HandleConnections(w http.ResponseWriter, r *http.Request) {
 	defer ws.Close()
 
 	clients[ws] = true
+	ctx := r.Context()
 
 	for {
 		var msg model.Message
-		
+
 		err := ws.ReadJSON(&msg)
 		if err != nil {
 				log.Printf("error reading json: %v", err)
 				delete(clients, ws)
-				break
+				return
 		}
 
-		ctx := r.Context()
 		error := h.Service.SaveToElastic(ctx, msg)
-		if error!= nil {
+		if error != nil {
 				log.Printf("error saving to ES: %v", error)
 				delete(clients, ws)
-				break
+				return
 		}
 
 		log.Printf("payload reading: %v", msg)
 		
 		broadcast <- msg
+
 	}
 
 }
