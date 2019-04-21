@@ -6,17 +6,17 @@ O modelo segue o seguinte exemplo:
 
 ```
 type Message struct {
-	ID			string			`json:"_id,omitempty"`
-	Text        string          `json:"text"`
-	CreatedAt   time.Time       `json:"createdAt"`
-	User        User            `json:"user"`
+	ID        string          `json:"_id,omitempty"`
+	Text      string          `json:"text"`
+	CreatedAt time.Time       `json:"createdAt"`
+	User      User            `json:"user"`
 }
 ```
 
 ```
 
 type User struct {
-	ID			int				`json:"_id,omitempty"`
+	ID          int             `json:"_id,omitempty"`
 	Name        string          `json:"name"`
 	Avatar      string          `json:"avatar"`
 }
