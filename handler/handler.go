@@ -36,7 +36,7 @@ func (h *Handler) HandleConnections(w http.ResponseWriter, r *http.Request) {
 				break
 		}
 
-		log.Printf("payload: %v", msg)
+		log.Printf("payload reading: %v", msg)
 		
 		broadcast <- msg
 	}
@@ -50,6 +50,7 @@ func (h *Handler) HandleMessages() {
 		
 		for client := range clients {
 				err := client.WriteJSON(msg)
+				log.Printf("payload writting: %v", msg)
 				if err != nil {
 						log.Printf("error: %v", err)
 						client.Close()
