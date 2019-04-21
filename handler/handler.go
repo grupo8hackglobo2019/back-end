@@ -32,6 +32,9 @@ func (h *Handler) SendViaPost(w http.ResponseWriter, r *http.Request) {
 
 		defer r.Body.Close()
 
+		log.Printf("payload sending via post: %v", payload)
+		broadcast <- payload
+
 		ctx := r.Context()
 
 		error := h.Service.SaveToElastic(ctx, payload)
@@ -39,11 +42,6 @@ func (h *Handler) SendViaPost(w http.ResponseWriter, r *http.Request) {
 				log.Printf("error saving to ES: %v", error)
 				return
 		}
-
-		log.Printf("payload sending via post: %v", payload)
-		
-		broadcast <- payload
-
 
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -72,16 +70,15 @@ func (h *Handler) HandleConnections(w http.ResponseWriter, r *http.Request) {
 				return
 		}
 
+		log.Printf("payload reading: %v", msg)
+		broadcast <- msg
+
 		error := h.Service.SaveToElastic(ctx, msg)
 		if error != nil {
 				log.Printf("error saving to ES: %v", error)
 				delete(clients, ws)
 				return
 		}
-
-		log.Printf("payload reading: %v", msg)
-		
-		broadcast <- msg
 
 	}
 

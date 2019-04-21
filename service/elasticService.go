@@ -35,10 +35,21 @@ func (e *ElasticService) SaveToElastic(ctx context.Context, payload model.Messag
 		}
 	}
 
+	var user = model.User {
+		Name: payload.User.Name,
+		Avatar: payload.User.Avatar,
+	}
+
+	var message = model.Message {
+		Text: payload.Text,
+		CreatedAt: payload.CreatedAt,
+		User: user,
+	}
+
 	_, error := e.ElasticCLI.Index().
 		Index(indexName).
 		Type(docType).
-		BodyJson(payload).
+		BodyJson(message).
 		Do(ctx)
 
 	if error != nil {
