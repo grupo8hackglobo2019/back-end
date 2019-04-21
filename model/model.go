@@ -9,14 +9,14 @@ type Config struct {
 }
 
 type Message struct {
-	ID			int			`json:"_id,omitempty"`
+	ID			string			`json:"_id,omitempty"`
 	Text		string			`json:"text"`
 	CreatedAt	time.Time		`json:"createdAt"`
 	User		User			`json:"user"`
 }
 
 type User struct {
-	ID			string			`json:"_id,omitempty"`
+	ID			int				`json:"_id,omitempty"`
 	Name		string			`json:"name"`
 	Avatar		string			`json:"avatar"`
 }
