@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"log"
     "net/http"
 
@@ -46,9 +47,9 @@ func main() {
 
 	go chatHandler.HandleMessages()
 
-	log.Println("http server started on :8000")
+	log.Println("http server started on " + os.Getenv("PORT"))
 
-	error := http.ListenAndServe(":8000", nil)
+	error := http.ListenAndServe(":" + os.Getenv("PORT"), nil)
 	if error != nil {
 			log.Fatal("ListenAndServe: ", error)
 	}
