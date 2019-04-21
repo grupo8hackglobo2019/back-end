@@ -2,6 +2,10 @@
 
 O projeto visa utilizar de melhor maneira os dados gerados pelo CartolaFC
 
+Segue abaixo o modelo de arquitetura:
+
+![alt text](arquitetura.png)
+
 O modelo segue o seguinte exemplo:
 
 ```
